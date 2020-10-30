@@ -1,6 +1,5 @@
 package com.myapp.youme
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -18,6 +17,7 @@ class MemoDisp : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_memo_disp)
         txtMain.setText(READFILE())
+        txtDir.setText(GLOBAL.NOWDIRECTORY)
     }
 
     //終了時処理
@@ -29,7 +29,7 @@ class MemoDisp : AppCompatActivity() {
 
     //メニューバー表示
     override fun onCreateOptionsMenu(menu: Menu?): Boolean{
-        menuInflater.inflate(R.menu.menu, menu)
+        menuInflater.inflate(R.menu.menu_edit, menu)
         return super.onCreateOptionsMenu(menu)
     }
 

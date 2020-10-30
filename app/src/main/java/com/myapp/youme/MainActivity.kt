@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         fab_memo.setOnClickListener{
             CreateMemoDialog()
         }
-
+        txtDir.setText(GLOBAL.NOWDIRECTORY)
     }
 
     //終了時処理
@@ -60,22 +62,27 @@ class MainActivity : AppCompatActivity() {
             val point:Int=GLOBAL.NOWDIRECTORY.lastIndexOf("/")
             if(point!=-1)GLOBAL.NOWDIRECTORY=GLOBAL.NOWDIRECTORY.substring(0,point)
         }
-
-        //ダイアログから追加を実行した場合、画面上では追加されるものの内部処理ではディレクトリが移動してしまう
-        //再表示処理等を再度行うと一つ上のディレクトリに移動したり、実際にフォルダやファイルが作成される場所がずれてしまう問題
-        //明日、ここの処理を再修正する必要あり
-
-        //明日はメモ画面の表示の際に実際の内部データが表示されるように変更する必要あり
-        //削除機能の実装をもってver1.0完成予定
-
-        //アプリアイコンや通知関連、タスクバーの処理等の追記も併せて明日中に実装する
-
-        //実際のデータの動作処理を確認すること
     }
 
     //再描画処理を作る※未完成
     override fun onResume(){
         super.onResume()
+    }
+
+    //メニューバー表示
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean{
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    //メニューボタンリスナークラス
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //ルートディレクトリへ回帰
+        if(item.itemId == R.id.menu_home){
+            GLOBAL.NOWDIRECTORY=""
+            ACTIVITY_RESTART()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     //戻るキー押下時処理
@@ -155,9 +162,13 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("新規リスト作成")
             .setView(myedit)
-            .setPositiveButton("ADD"){dialog,which->
+            .setPositiveButton("作成"){dialog,which->
                 CreateListFile(myedit.getText().toString())
-            }.show()
+            }
+            .setNegativeButton("キャンセル") { dialog, which ->
+            }
+            .setCancelable(false)
+            .show()
     }
 
     //メモ作成時ダイアログの作成
@@ -167,9 +178,13 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("新規メモ作成")
             .setView(myedit)
-            .setPositiveButton("ADD"){dialog,which->
+            .setPositiveButton("作成"){dialog,which->
                 CreateMemoFile(myedit.getText().toString())
-            }.show()
+            }
+            .setNegativeButton("キャンセル") { dialog, which ->
+            }
+            .setCancelable(false)
+            .show()
     }
 
     //削除確認ダイアログの作成
@@ -199,10 +214,7 @@ class MainActivity : AppCompatActivity() {
         val file=File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+filename)
         file.delete()
 
-        //画面に更新処理をかける
-        finish()
-        startActivity(getIntent())
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        ACTIVITY_RESTART()
     }
     //リストを実際に作成
     fun CreateListFile(text:String){
@@ -210,9 +222,7 @@ class MainActivity : AppCompatActivity() {
             val file= File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+text)
             file.mkdir()
         }
-        finish()
-        startActivity(getIntent())
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        ACTIVITY_RESTART()
     }
 
     //メモを実際に作成
@@ -227,9 +237,7 @@ class MainActivity : AppCompatActivity() {
             val file= File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+filename+".txt")
             file.writeText(text)
         }
-        finish()
-        startActivity(getIntent())
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        ACTIVITY_RESTART()
     }
 
     //ファイル読み込み処理
@@ -242,6 +250,12 @@ class MainActivity : AppCompatActivity() {
         }catch(e: FileNotFoundException) {
             return null
         }
+    }
+
+    fun ACTIVITY_RESTART(){
+        finish()
+        startActivity(getIntent())
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
 }
