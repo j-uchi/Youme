@@ -2,7 +2,6 @@ package com.myapp.youme
 
 import android.app.AlertDialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,9 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.*
+import java.io.File
+import java.io.FileNotFoundException
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -215,7 +219,14 @@ class MainActivity : AppCompatActivity() {
     fun DeleteFile(filename:String){
         //ファイルを削除する
         val file=File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+filename)
-        file.delete()
+        if(file.delete()){
+            //削除成功
+            Toast.makeText(applicationContext, "削除しました", Toast.LENGTH_SHORT).show()
+        }
+        else{
+            //削除失敗
+            Toast.makeText(applicationContext, "データが残っています", Toast.LENGTH_SHORT).show()
+        }
 
         ACTIVITY_RESTART()
     }
