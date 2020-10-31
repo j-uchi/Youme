@@ -23,8 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val list=READFILE()
-        if(list!=null)addItems(list)
+        DispReflesh()
 
         //fabリスナークラス
         val fab_plus: View =findViewById(R.id.fab_plus)
@@ -51,22 +50,16 @@ class MainActivity : AppCompatActivity() {
         fab_memo.setOnClickListener{
             CreateMemoDialog()
         }
-        txtDir.setText(GLOBAL.NOWDIRECTORY)
+
     }
 
-    //終了時処理
-    override fun onDestroy(){
-        super.onDestroy()
-        if(GLOBAL.currentflg==true){
-            GLOBAL.currentflg=false
-            val point:Int=GLOBAL.NOWDIRECTORY.lastIndexOf("/")
-            if(point!=-1)GLOBAL.NOWDIRECTORY=GLOBAL.NOWDIRECTORY.substring(0,point)
-        }
-    }
-
-    //再描画処理を作る※未完成
+    //再表示処理
     override fun onResume(){
         super.onResume()
+        if(GLOBAL.refleshflg){
+            GLOBAL.refleshflg=false
+            DispReflesh()
+        }
     }
 
     //メニューバー表示
@@ -88,9 +81,17 @@ class MainActivity : AppCompatActivity() {
     //戻るキー押下時処理
     override fun onBackPressed(){
         super.onBackPressed()
-        GLOBAL.currentflg=true
+        val point:Int=GLOBAL.NOWDIRECTORY.lastIndexOf("/")
+        if(point!=-1)GLOBAL.NOWDIRECTORY=GLOBAL.NOWDIRECTORY.substring(0,point)
         finish()
         overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out)
+    }
+
+    //画面のリフレッシュ
+    fun DispReflesh(){
+        val list=READFILE()
+        if(list!=null)addItems(list)
+        txtDir.setText("Dir : "+GLOBAL.NOWDIRECTORY)
     }
 
     //画面にファイルやフォルダを表示
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //レイアウトのタップ時処理分岐
     fun LayoutListener(num:Int,directoryName:String){
         GLOBAL.NOWDIRECTORY +="/"+directoryName
         if(GLOBAL.NOWDIRECTORY.lastIndexOf(".")!=-1){
@@ -168,6 +170,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("キャンセル") { dialog, which ->
             }
             .setCancelable(false)
+            .setIcon(R.drawable.ic_baseline_format_list_bulleted_24)
             .show()
     }
 
@@ -184,6 +187,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("キャンセル") { dialog, which ->
             }
             .setCancelable(false)
+            .setIcon(R.drawable.ic_baseline_message_24)
             .show()
     }
 
@@ -209,17 +213,22 @@ class MainActivity : AppCompatActivity() {
 
     //ファイル削除
     fun DeleteFile(filename:String){
-
         //ファイルを削除する
         val file=File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+filename)
         file.delete()
 
         ACTIVITY_RESTART()
     }
+
     //リストを実際に作成
     fun CreateListFile(text:String){
         if(text!=""){
-            val file= File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+text)
+            var filename:String=text
+            if(filename.length>14){
+                filename=filename.substring(0,14)
+                filename+="…"
+            }
+            val file= File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+filename)
             file.mkdir()
         }
         ACTIVITY_RESTART()
@@ -229,8 +238,8 @@ class MainActivity : AppCompatActivity() {
     fun CreateMemoFile(text:String){
         if(text!=""){
             var filename:String=text
-            if(filename.length>9){
-                filename=filename.substring(0,9)
+            if(filename.length>14){
+                filename=filename.substring(0,14)
                 filename+="…"
             }
             //この辺の処理から
@@ -242,7 +251,6 @@ class MainActivity : AppCompatActivity() {
 
     //ファイル読み込み処理
     fun READFILE():Array<String>?{
-        val GLOBAL=MyApp.getInstance()
         try{
             val file= File("$filesDir"+GLOBAL.NOWDIRECTORY)
             val f_list=file.list()
@@ -252,6 +260,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //アクティビティ自体をリロード
     fun ACTIVITY_RESTART(){
         finish()
         startActivity(getIntent())

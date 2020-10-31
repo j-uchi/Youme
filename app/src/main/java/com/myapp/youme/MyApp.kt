@@ -7,7 +7,7 @@ import java.io.FileNotFoundException
 class MyApp : Application(){
 
     var NOWDIRECTORY:String=""
-    var currentflg=false
+    var refleshflg=false
 
     override fun onCreate(){
         super.onCreate()
