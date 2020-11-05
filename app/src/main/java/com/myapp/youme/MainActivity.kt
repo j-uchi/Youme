@@ -12,7 +12,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileNotFoundException
@@ -77,7 +76,10 @@ class MainActivity : AppCompatActivity() {
         //ルートディレクトリへ回帰
         if(item.itemId == R.id.menu_home){
             GLOBAL.NOWDIRECTORY=""
-            ACTIVITY_RESTART()
+            val INTENT=getIntent()
+            INTENT.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(INTENT)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
         return super.onOptionsItemSelected(item)
     }
