@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
     //削除確認ダイアログの作成
     fun CreateDeleteDialog(f_name:String,f_type:Boolean){
         var str:String=""
-        if(f_type==true)str="フォルダ : "+f_name
+        if(f_type)str="フォルダ : "+f_name
         else str="ファイル:"+f_name
         AlertDialog.Builder(this)
             .setTitle(str)
@@ -211,10 +211,51 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("キャンセル"){dialog,which->
             }
             .setNeutralButton("名称変更"){dialog,which->
-                //追加でダイアログを作成する
+                CreateRenameDialog(f_name,f_type)
             }
             .setIcon(R.drawable.ic_baseline_warning_24)
             .show()
+    }
+
+    //名称変更ダイアログの作成
+    fun CreateRenameDialog(f_name:String,f_type:Boolean){
+
+        val myedit= EditText(this)
+        var str=""
+
+        if(!f_type)str=hideExtention(f_name)
+        else str=f_name
+
+        myedit.setText(str)
+        AlertDialog.Builder(this)
+            .setTitle("名称変更")
+            .setView(myedit)
+            .setPositiveButton("変更"){dialog,which->
+                Rename(f_name,myedit.text.toString(),f_type)
+            }
+            .setNegativeButton("キャンセル") { dialog, which ->
+            }
+            .setCancelable(false)
+            .setIcon(R.drawable.ic_baseline_format_list_bulleted_24)
+            .show()
+    }
+
+    fun Rename(f_name:String,new_f_name:String,f_type:Boolean){
+
+        if(f_type){
+            val fOld:File = File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+f_name)
+            val fNew:File=File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+new_f_name)
+            fOld.renameTo(fNew)
+        }
+        else{
+            val nstr= "$new_f_name.txt"
+            val fOld:File = File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+f_name)
+            val fNew:File=File("$filesDir/"+GLOBAL.NOWDIRECTORY+"/"+nstr)
+            fOld.renameTo(fNew)
+        }
+
+        ACTIVITY_RESTART()
+
     }
 
     //ファイル削除
