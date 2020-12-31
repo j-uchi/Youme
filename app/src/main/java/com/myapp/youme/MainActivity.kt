@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("キャンセル") { dialog, which ->
             }
             .setCancelable(false)
-            .setIcon(R.drawable.ic_baseline_format_list_bulleted_24)
+            .setIcon(R.drawable.ic_baseline_spellcheck_24)
             .show()
     }
 
